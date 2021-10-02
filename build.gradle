@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+
+group 'io.github.tanialx'
+version '0.0.1-SNAPSHOT'
+
+javafx {
+    version = "17"
+    modules = [ 'javafx.controls' ]
+    configuration = 'compileOnly'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
