@@ -1,9 +1,9 @@
 package io.github.tanialx.jfxoo.test;
 
 import io.github.tanialx.jfxoo.JFXooForm;
-import java.lang.Object;
 import java.lang.Override;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -21,7 +21,7 @@ public class JFXooFormBook implements JFXooForm {
     }
 
     @Override
-    public Object node() {
+    public Node node() {
         return grid;
     }
 

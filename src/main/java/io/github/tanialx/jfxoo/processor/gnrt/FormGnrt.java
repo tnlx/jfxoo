@@ -20,6 +20,7 @@ public class FormGnrt {
     private final ClassName TEXTFIELD = ClassName.get("javafx.scene.control", "TextField");
     private final ClassName POS = ClassName.get("javafx.geometry", "Pos");
     private final ClassName GRIDPANE = ClassName.get("javafx.scene.layout", "GridPane");
+    private final ClassName NODE = ClassName.get("javafx.scene", "Node");
 
     public FormGnrt(ProcessingEnvironment procEnv) {
         this.procEnv = procEnv;
@@ -45,7 +46,7 @@ public class FormGnrt {
     private MethodSpec get() {
         MethodSpec.Builder mb = MethodSpec.methodBuilder("node");
         mb.addAnnotation(Override.class);
-        mb.returns(Object.class);
+        mb.returns(NODE);
         mb.addModifiers(PUBLIC);
         mb.addStatement("return grid");
         return mb.build();

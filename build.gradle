@@ -2,8 +2,13 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
 }
-
+javafx {
+    version = '12'
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    configuration = 'compileOnly'
+}
 group 'io.github.tanialx'
 version '0.0.1'
 

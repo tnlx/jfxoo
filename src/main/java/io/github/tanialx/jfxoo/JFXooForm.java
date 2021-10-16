@@ -1,6 +1,8 @@
 package io.github.tanialx.jfxoo;
 
+import javafx.scene.Node;
+
 public interface JFXooForm {
 
-    Object node();
+    Node node();
 }
