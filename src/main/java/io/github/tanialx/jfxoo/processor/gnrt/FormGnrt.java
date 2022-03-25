@@ -2,6 +2,7 @@ package io.github.tanialx.jfxoo.processor.gnrt;
 
 import com.squareup.javapoet.*;
 import io.github.tanialx.jfxoo.JFXooForm;
+import io.github.tanialx.jfxoo.annotation.JFXooVar;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +33,10 @@ public class FormGnrt {
     private final ClassName GRIDPANE = ClassName.get("javafx.scene.layout", "GridPane");
     private final ClassName NODE = ClassName.get("javafx.scene", "Node");
     private final ClassName DATEPICKER = ClassName.get("javafx.scene.control", "DatePicker");
+    private final ClassName PASSWORDFIELD = ClassName.get("javafx.scene.control", "PasswordField");
+    private final ClassName TEXT = ClassName.get("javafx.scene.text", "Text");
+    private final ClassName FONT = ClassName.get("javafx.scene.text", "Font");
+    private final ClassName FONTWEIGHT = ClassName.get("javafx.scene.text", "FontWeight");
 
     private List<Field> fs;
 
@@ -44,6 +49,7 @@ public class FormGnrt {
         private String inputControlName;
         private String getter;
         private String setter;
+        private String varType;
     }
 
     public FormGnrt(ProcessingEnvironment procEnv) {
@@ -55,12 +61,14 @@ public class FormGnrt {
         return ElementFilter.fieldsIn(te.getEnclosedElements()).stream().map(ve -> {
             String fieldName = ve.getSimpleName().toString();
             String nameInMethod = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+            JFXooVar jfXooVar = ve.getAnnotation(JFXooVar.class);
             return Field.builder()
                     .name(fieldName)
                     .setter(String.format("set%s", nameInMethod))
                     .getter(String.format("get%s", nameInMethod))
                     .inputControlName("in_" + fieldName)
                     .type(ve.asType())
+                    .varType(jfXooVar != null ? jfXooVar.type() : "")
                     .build();
         }).collect(Collectors.toList());
     }
@@ -82,7 +90,7 @@ public class FormGnrt {
                         .addFields(props())
                         .addMethod(JFXooForm_get())
                         .addMethod(constructor())
-                        .addMethod(layout())
+                        .addMethod(layout(te))
                         .addMethod(JFXooForm_init(te))
                         .addMethod(JFXooForm_value(te))
                         .build())
@@ -154,7 +162,9 @@ public class FormGnrt {
         for (Field f : fs) {
             if (sameType(f, LocalDate.class)) {
                 fss.add(FieldSpec.builder(DATEPICKER, f.getInputControlName(), PRIVATE).build());
-            } else {
+            } else if (f.getVarType().equals("password")) {
+                fss.add(FieldSpec.builder(PASSWORDFIELD, f.getInputControlName(), PRIVATE).build());
+            }else {
                 fss.add(FieldSpec.builder(TEXTFIELD, f.getInputControlName(), PRIVATE).build());
             }
         }
@@ -170,19 +180,25 @@ public class FormGnrt {
         return mb.build();
     }
 
-    private MethodSpec layout() {
+    private MethodSpec layout(TypeElement te) {
         // TODO: Form controls (Save, Cancel buttons)
         MethodSpec.Builder mb = MethodSpec.methodBuilder("_layout");
         mb.addModifiers(PRIVATE);
-        int row = 0;
-        int col = 0;
 
+        mb.addStatement("$T $L = new $T($S)", TEXT, "heading", TEXT, te.getSimpleName().toString());
+        mb.addStatement("$L.setFont($T.font($S,$T.$L,$L))", "heading", FONT, "Tahoma", FONTWEIGHT, "NORMAL", 20);
+        mb.addStatement("grid.add($L, 0, 0, 2, 1)", "heading");
+
+        int row = 1;
+        int col = 0;
         for (Field f : fs) {
             String labelName = "label_" + f.getName();
             String inputName = f.getInputControlName();
             mb.addStatement("$T $L = new $T($S)", LABEL, labelName, LABEL, labelFormat(f.getName()));
             if (sameType(f, LocalDate.class)) {
                 mb.addStatement("$L = new $T()", inputName, DATEPICKER);
+            } else if (f.getVarType().equals("password")) {
+                mb.addStatement("$L = new $T()", inputName, PASSWORDFIELD);
             } else {
                 mb.addStatement("$L = new $T()", inputName, TEXTFIELD);
             }

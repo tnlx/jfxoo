@@ -11,6 +11,9 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 public class JFXooFormBook implements JFXooForm<Book> {
 
@@ -34,25 +37,29 @@ public class JFXooFormBook implements JFXooForm<Book> {
     }
 
     private void _layout() {
+        Text heading = new Text("Book");
+        heading.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(heading, 0, 0, 2, 1);
+
         Label label_title = new Label("Title");
         in_title = new TextField();
-        grid.add(label_title, 0, 0);
-        grid.add(in_title, 1, 0);
+        grid.add(label_title, 0, 1);
+        grid.add(in_title, 1, 1);
 
         Label label_author = new Label("Author");
         in_author = new TextField();
-        grid.add(label_author, 0, 1);
-        grid.add(in_author, 1, 1);
+        grid.add(label_author, 0, 2);
+        grid.add(in_author, 1, 2);
 
         Label label_publishedDate = new Label("Published Date");
         in_publishedDate = new DatePicker();
-        grid.add(label_publishedDate, 0, 2);
-        grid.add(in_publishedDate, 1, 2);
+        grid.add(label_publishedDate, 0, 3);
+        grid.add(in_publishedDate, 1, 3);
 
         Label label_price = new Label("Price");
         in_price = new TextField();
-        grid.add(label_price, 0, 3);
-        grid.add(in_price, 1, 3);
+        grid.add(label_price, 0, 4);
+        grid.add(in_price, 1, 4);
     }
 
     @Override
