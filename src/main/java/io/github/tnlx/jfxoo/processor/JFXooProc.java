@@ -1,9 +1,8 @@
-package io.github.tanialx.jfxoo.processor;
+package io.github.tnlx.jfxoo.processor;
 
 import com.squareup.javapoet.JavaFile;
-import io.github.tanialx.jfxoo.annotation.JFXooForm;
-import io.github.tanialx.jfxoo.processor.gnrt.CreatorGnrt;
-import io.github.tanialx.jfxoo.processor.gnrt.FormGnrt;
+import io.github.tnlx.jfxoo.annotation.JFXooForm;
+import io.github.tnlx.jfxoo.annotation.JFXooTable;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -16,43 +15,48 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class JFXooProc extends AbstractProcessor {
 
-    private final List<TypeElement> tes = new ArrayList<>();
     private CreatorGnrt creatorGnrt;
     private FormGnrt formGnrt;
-    private boolean CREATOR_WRITTEN = false;
+    private TableGnrt tableGnrt;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         creatorGnrt = new CreatorGnrt(processingEnv);
         formGnrt = new FormGnrt(processingEnv);
+        tableGnrt = new TableGnrt(processingEnv);
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+
         /*
          * Generate code for JFXoo supported annotations
          * - JFXooForm
-         * and write to 'generated' output path
+         * - JFXooTable
          */
-        if (!roundEnv.processingOver()) {
-            tes.addAll(roundEnv.getElementsAnnotatedWith(JFXooForm.class)
-                    .stream()
-                    .filter(e -> e.getKind() == ElementKind.CLASS)
-                    .map(e -> (TypeElement) e)
-                    .collect(Collectors.toList()));
-        } else {
-            tes.forEach(te -> {
-                this.output(formGnrt.run(te));
-                creatorGnrt.add(te);
-            });
-            if (!CREATOR_WRITTEN && this.output(creatorGnrt.run())) {
-                CREATOR_WRITTEN = true;
-            }
+        List<TypeElement> forms = new ArrayList<>(roundEnv.getElementsAnnotatedWith(JFXooForm.class)
+                .stream()
+                .filter(e -> e.getKind() == ElementKind.CLASS)
+                .map(e -> (TypeElement) e).toList());
+        List<TypeElement> table = new ArrayList<>(roundEnv.getElementsAnnotatedWith(JFXooTable.class)
+                .stream()
+                .filter(e -> e.getKind() == ElementKind.CLASS)
+                .map(e -> (TypeElement) e).toList());
+        forms.forEach(te -> {
+            this.output(formGnrt.run(te));
+            creatorGnrt.form(te);
+        });
+        table.forEach(te -> {
+            this.output(tableGnrt.run(te));
+            creatorGnrt.table(te);
+        });
+        if (creatorGnrt.pending()) {
+            this.output(creatorGnrt.run());
+            creatorGnrt.clear();
         }
         return false;
     }

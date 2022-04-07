@@ -7,6 +7,21 @@ to generate [JavaFX](https://openjfx.io/) Form (GridPane) during compile time.
 
 ### Usage
 
+This library is not yet stable so it's not yet published to maven central, but you can find it in snapshot repository
+
+#### In build.gradle
+
+```gradle
+dependencies {
+    implementation 'io.github.tnlx:jfxoo:0.1.0'
+    annotationProcessor 'io.github.tnlx:jfxoo:0.1.0'
+}
+```
+
+#### In .java source code
+
+##### Form
+
 Annotate object with `@JFXooForm`
 
 ```java
@@ -27,6 +42,25 @@ JFXoo jfxoo = JFXoo.init();
 Retrieve the generate form to add to parent view
 
 ```java
-JFXooForm contactForm = jfxoo.get("Contact");
-Node form = (Node) contactForm.node(); // retrieve inner gridpane property within JFXooForm
+JFXooForm<Contact> contactForm = jfxoo.get("Contact", Contact.class);
+Node form = contactForm.node(); // retrieve inner node property within JFXooForm
+
+// registered buttons to be displayed at the bottom of the form
+//
+loginForm.button("Log in", logins -> {
+    // do something on button clicked
+}
+```
+
+##### Table
+
+Annotate object with `@JFXooTable`
+
+```java
+JFXooTable<Contact> contactTable = jfxoo.table("Contact", Contact.class);
+
+// javafx node to added to scene
+//
+Node node = contactTable.node(); // table and basic control buttons (as VBox)
+Node table = contactTable.table(); // only table
 ```

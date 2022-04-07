@@ -1,10 +1,10 @@
-package io.github.tanialx.jfxoo;
+package io.github.tnlx.jfxoo;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class JFXoo {
 
-    public static final String JFXOO_CREATOR = "io.github.tanialx.jfxoo.JFXooCreatorImpl";
+    public static final String JFXOO_CREATOR = "io.github.tnlx.jfxoo.JFXooCreatorImpl";
     private static JFXoo _instance;
     private final JFXooCreator creator;
 
@@ -22,7 +22,11 @@ public class JFXoo {
         return _instance;
     }
 
-    public <T> JFXooForm<T> get(String name, Class<T> T) {
-        return creator.create(name, T);
+    public <T> JFXooForm<T> form(String name, Class<T> T) {
+        return creator.form(name, T);
+    }
+
+    public <T> JFXooTable<T> table(String name, Class<T> T) {
+        return creator.table(name, T);
     }
 }

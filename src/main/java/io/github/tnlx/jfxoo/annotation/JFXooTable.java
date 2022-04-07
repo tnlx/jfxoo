@@ -1,4 +1,4 @@
-package io.github.tanialx.jfxoo.annotation;
+package io.github.tnlx.jfxoo.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
-public @interface JFXooForm {
+public @interface JFXooTable {
 }

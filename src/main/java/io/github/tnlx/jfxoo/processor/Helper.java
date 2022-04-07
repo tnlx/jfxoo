@@ -1,4 +1,10 @@
-package io.github.tanialx.jfxoo.processor.gnrt;
+package io.github.tnlx.jfxoo.processor;
+
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+
+import java.util.Collections;
+import java.util.List;
 
 public class Helper {
 
@@ -31,5 +37,20 @@ public class Helper {
             }
         }
         return sb.toString();
+    }
+
+    public static List<TypeName> typeArgs(TypeName type) {
+        if (type instanceof ParameterizedTypeName) {
+            return ((ParameterizedTypeName) type).typeArguments;
+        }
+        return Collections.emptyList();
+    }
+
+    public static boolean isFromType(TypeName type, TypeName from) {
+        if (type instanceof ParameterizedTypeName) {
+            TypeName typeName = ((ParameterizedTypeName) type).rawType;
+            return (typeName.equals(from));
+        }
+        return false;
     }
 }
