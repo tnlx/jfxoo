@@ -1,14 +1,20 @@
 plugins {
     id 'java-library'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
     id "maven-publish"
     id 'signing'
-    id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+javafx {
+    version = '21'
+    modules = ['javafx.controls']
+    configurations = ['compileOnly', 'testImplementation']
 }
 
 group 'io.github.tnlx'
@@ -18,32 +24,12 @@ repositories {
     mavenCentral()
 }
 
-import org.apache.tools.ant.taskdefs.condition.Os
-def jfxClassifier
-task os(){
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        jfxClassifier = 'win'
-    } else if (Os.isFamily(Os.FAMILY_MAC)) {
-        jfxClassifier = 'mac'
-    } else {
-        jfxClassifier = 'linux'
-    }
-}
-
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
     implementation 'com.squareup:javapoet:1.13.0'
     testImplementation 'com.squareup:javapoet:1.13.0'
-    compileOnly "org.openjfx:javafx-base:18:${jfxClassifier}"
-    compileOnly "org.openjfx:javafx-controls:18:${jfxClassifier}"
-    compileOnly "org.openjfx:javafx-graphics:18:${jfxClassifier}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation 'com.google.testing.compile:compile-testing:0.19'
-    testImplementation "org.openjfx:javafx-base:18:${jfxClassifier}"
-    testImplementation "org.openjfx:javafx-controls:18:${jfxClassifier}"
-    testImplementation "org.openjfx:javafx-graphics:18:${jfxClassifier}"
 }
 
 test {
@@ -55,7 +41,6 @@ test {
     }
 }
 
-
 // OSSRH requires javadoc and sources https://central.sonatype.org/pages/requirements.html
 java {
     withJavadocJar()
@@ -64,17 +49,13 @@ java {
 
 publishing {
     publications {
-        jfxooMaven(MavenPublication) {
-            groupId = project.group.toString()
-            artifactId = rootProject.name
-            version = project.version.toString()
-
+        jfxoo(MavenPublication) {
             from(components.java)
 
             // POM metadata
             pom {
                 name = artifactId
-                description = "Generate JavaFX form at compile time"
+                description = "Generate JavaFX Form at compile time"
                 url = "https://github.com/tnlx/jfxoo"
                 licenses {
                     license {
@@ -99,33 +80,19 @@ publishing {
 }
 
 signing {
-    required { project.gradle.taskGraph.hasTask("required") }
-    def signingKey = System.getenv("SIGNING_KEY")
-    def signingPassword = System.getenv("SIGNING_PASSWORD")
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.jfxooMaven
+    sign publishing.publications.jfxoo
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
-            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            username = System.getenv("OSSRH_USERNAME")
-            password = System.getenv("OSSRH_PASSWORD")
-        }
-    }
-}
-
-// ./gradlew publishJfxooMavenPublicationToLocalRepository
-// tree ./build/repos/
+// ./gradlew publishJfxooPublicationToLocalRepository
+// tree ./build/pub/
 publishing {
     repositories {
         maven {
             name = "local"
-            def releasesRepoUrl = "$buildDir/repos/releases"
-            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
-            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+            url = rootProject.layout.buildDirectory.dir("pub")
         }
     }
 }

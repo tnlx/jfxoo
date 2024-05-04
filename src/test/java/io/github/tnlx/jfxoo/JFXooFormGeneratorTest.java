@@ -30,8 +30,8 @@ public class JFXooFormGeneratorTest {
         assertThat(compilation)
                 .generatedFile(SOURCE_OUTPUT,
                         "io.github.tnlx.jfxoo",
-                        "JFXooCreatorImpl.java")
-                .hasSourceEquivalentTo(fromResource("ExpectedJFXooCreatorImpl.java"));
+                        "JFXooCreators.java")
+                .hasSourceEquivalentTo(fromResource("ExpectedJFXooCreators.java"));
         assertThat(compilation)
                 .generatedFile(SOURCE_OUTPUT,
                 "io.github.tnlx.jfxoo.test",

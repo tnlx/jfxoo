@@ -4,13 +4,14 @@ import java.lang.reflect.InvocationTargetException;
 
 public class JFXoo {
 
-    public static final String JFXOO_CREATOR = "io.github.tnlx.jfxoo.JFXooCreatorImpl";
+    public static final String JFXOO_CREATOR_PKG = JFXooCreator.class.getPackageName();
+    public static final String JFXOO_CREATOR_TYPE = "JFXooCreators";
     private static JFXoo _instance;
     private final JFXooCreator creator;
 
     private JFXoo() throws ClassNotFoundException, InvocationTargetException,
             InstantiationException, IllegalAccessException {
-        Class<?> _class = JFXoo.class.getClassLoader().loadClass(JFXOO_CREATOR);
+        Class<?> _class = JFXoo.class.getClassLoader().loadClass(JFXOO_CREATOR_PKG + "." + JFXOO_CREATOR_TYPE);
         creator = (JFXooCreator) _class.getConstructors()[0].newInstance();
     }
 

@@ -8,7 +8,7 @@ import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
 
-public class JFXooCreatorImpl implements JFXooCreator {
+public class JFXooCreators implements JFXooCreator {
 
     @Override
     public <T> JFXooForm<T> form(String name, Class<T> T) {

@@ -1,24 +1,48 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    tags:
+      - 'v[0-9]+\.[0-9]+\.*'
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v3.0.0
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: adopt
+          distribution: temurin
           cache: 'gradle'
-      - name: Test
-        run: ./gradlew clean test
-      - name: Publish snapshot to Sonatype
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'tnlx/jfxoo'
-        run: ./gradlew publishToSonatype
+
+      - name: Get version from tag
+        id: version
+        run: |
+          APP_VERSION=${GITHUB_REF_NAME#v}
+          echo "VERSION=${APP_VERSION}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Build/test
+        run: ./gradlew build -Pversion=${{ steps.version.outputs.VERSION }}
+
+      - name: Create artifacts
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSKEY }}
+        run: ./gradlew publishJfxooPublicationToLocalRepository
+
+      - name: Deploy to SonaType
+        env:
+          SONATYPE_TOKEN: ${{ secrets.SONATYPE_TOKEN }}
+        run: |
+          cd build/pub
+          zip -r bundle-${{ steps.version.outputs.VERSION }}.zip io/github/tnlx/jfxoo/${{ steps.version.outputs.VERSION }}/*
+          curl --request POST \
+            --verbose \
+            --header "Authorization: Bearer $SONATYPE_TOKEN" \
+            --form bundle=@bundle-${{ steps.version.outputs.VERSION }}.zip \
+            https://central.sonatype.com/api/v1/publisher/upload

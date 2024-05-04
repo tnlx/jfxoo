@@ -1,6 +1,15 @@
 package io.github.tnlx.jfxoo.processor;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
+import io.github.tnlx.jfxoo.JFXoo;
 import io.github.tnlx.jfxoo.JFXooCreator;
 import io.github.tnlx.jfxoo.JFXooForm;
 import io.github.tnlx.jfxoo.JFXooTable;
@@ -43,11 +52,9 @@ public class CreatorGnrt {
     }
 
     public JavaFile run() {
-        final String pkg = "io.github.tnlx.jfxoo";
-        final String _class = "JFXooCreatorImpl";
         return JavaFile.builder(
-                        pkg,
-                        TypeSpec.classBuilder(_class)
+                        JFXoo.JFXOO_CREATOR_PKG,
+                        TypeSpec.classBuilder(JFXoo.JFXOO_CREATOR_TYPE)
                                 .addModifiers(PUBLIC)
                                 .addSuperinterface(JFXooCreator.class)
                                 .addMethod(form())

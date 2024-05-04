@@ -1,10 +1,16 @@
 package io.github.tnlx.jfxoo.processor;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import io.github.tnlx.jfxoo.JFXooForm;
 import io.github.tnlx.jfxoo.JFXooFormSnackBar;
 import io.github.tnlx.jfxoo.annotation.JFXooVar;
-import lombok.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
@@ -35,9 +41,6 @@ public class FormGnrt {
     private final Elements elements;
     private List<Field> fs;
 
-    @Builder
-    @Getter
-    @Setter
     public static class Field {
         private String name;
         private String label;
@@ -49,15 +52,150 @@ public class FormGnrt {
         private ClassName control;
         private Position pLabel;
         private Position pInput;
+
+        private Field(Builder builder) {
+            name = builder.name;
+            label = builder.label;
+            type = builder.type;
+            pkg = builder.pkg;
+            inputControlName = builder.inputControlName;
+            getter = builder.getter;
+            setter = builder.setter;
+            control = builder.control;
+            pLabel = builder.pLabel;
+            pInput = builder.pInput;
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public TypeMirror getType() {
+            return type;
+        }
+
+        public String getPkg() {
+            return pkg;
+        }
+
+        public String getInputControlName() {
+            return inputControlName;
+        }
+
+        public String getGetter() {
+            return getter;
+        }
+
+        public String getSetter() {
+            return setter;
+        }
+
+        public ClassName getControl() {
+            return control;
+        }
+
+        public Position getpLabel() {
+            return pLabel;
+        }
+
+        public Position getpInput() {
+            return pInput;
+        }
+
+        public static final class Builder {
+            private String name;
+            private String label;
+            private TypeMirror type;
+            private String pkg;
+            private String inputControlName;
+            private String getter;
+            private String setter;
+            private ClassName control;
+            private Position pLabel;
+            private Position pInput;
+
+            private Builder() {
+            }
+
+            public Builder name(String name) {
+                this.name = name;
+                return this;
+            }
+
+            public Builder label(String label) {
+                this.label = label;
+                return this;
+            }
+
+            public Builder type(TypeMirror type) {
+                this.type = type;
+                return this;
+            }
+
+            public Builder pkg(String pkg) {
+                this.pkg = pkg;
+                return this;
+            }
+
+            public Builder inputControlName(String inputControlName) {
+                this.inputControlName = inputControlName;
+                return this;
+            }
+
+            public Builder getter(String getter) {
+                this.getter = getter;
+                return this;
+            }
+
+            public Builder setter(String setter) {
+                this.setter = setter;
+                return this;
+            }
+
+            public Builder control(ClassName control) {
+                this.control = control;
+                return this;
+            }
+
+            public Builder pLabel(Position pLabel) {
+                this.pLabel = pLabel;
+                return this;
+            }
+
+            public Builder pInput(Position pInput) {
+                this.pInput = pInput;
+                return this;
+            }
+
+            public Field build() {
+                return new Field(this);
+            }
+        }
     }
 
-    @AllArgsConstructor
-    @NoArgsConstructor
     private static class Position {
         public int row;
         public int col;
         public int rowspan;
         public int colspan;
+
+        public Position() {
+        }
+
+        public Position(int row, int col, int rowspan, int colspan) {
+            this.row = row;
+            this.col = col;
+            this.rowspan = rowspan;
+            this.colspan = colspan;
+        }
     }
 
     public FormGnrt(ProcessingEnvironment procEnv) {

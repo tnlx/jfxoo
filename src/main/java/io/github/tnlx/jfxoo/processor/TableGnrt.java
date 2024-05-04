@@ -1,6 +1,12 @@
 package io.github.tnlx.jfxoo.processor;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import io.github.tnlx.jfxoo.JFXooTable;
 import io.github.tnlx.jfxoo.annotation.JFXooVar;
 
@@ -13,7 +19,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.github.tnlx.jfxoo.processor.CLSName.*;
+import static io.github.tnlx.jfxoo.processor.CLSName.BUTTON;
+import static io.github.tnlx.jfxoo.processor.CLSName.HBOX;
+import static io.github.tnlx.jfxoo.processor.CLSName.SCENE;
+import static io.github.tnlx.jfxoo.processor.CLSName.SIMPLE_OBJECT_PROPERTY;
+import static io.github.tnlx.jfxoo.processor.CLSName.STAGE;
+import static io.github.tnlx.jfxoo.processor.CLSName.TABLEVIEW;
+import static io.github.tnlx.jfxoo.processor.CLSName.TABLE_COLUMN;
+import static io.github.tnlx.jfxoo.processor.CLSName.VBOX;
 import static io.github.tnlx.jfxoo.processor.Helper.isFromType;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
